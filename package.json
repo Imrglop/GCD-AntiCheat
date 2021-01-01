@@ -1,0 +1,22 @@
+{
+  "name": "gcd_anticheat",
+  "version": "2.0.0",
+  "description": "Uses Minecraft Vanilla Scripting API to prevent cheating in servers",
+  "main": "src\\index.ts",
+  "dependencies": {
+    "minecraft-scripting-types-server": "^1.0.0",
+    "minecraft-scripting-types-shared": "^1.0.0",
+    "ts-loader": "^8.0.13",
+    "typescript": "^4.1.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/Imrglop/GCD-AntiCheat-V2"
+  },
+  "author": "Imrglop",
+  "license": "GPL-3.0"
+}
