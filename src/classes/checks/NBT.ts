@@ -1,19 +1,21 @@
-import { config } from "../../config";
+// ----------- Imports -----------
+
+import { cGlobal } from "../../index";
 import { Check, TCheck } from "../Check";
+
+// ----------- Class -----------
 
 export class NBT extends Check implements TCheck {
     settings: any
     constructor() {
-        super('NBT', config.getActionType<NBT>('nbt'), 'nbt');
+        console.log(cGlobal);
+        super('NBT', cGlobal.getActionType<NBT>('nbt'), 'nbt');
     }
-    onTick(): void {
-        throw new Error("Method not implemented.");
+    public onTick(): void {
     }
-    onEnable(): void {
-        eval(`server.__gcd_nbt_start__(this.settings.actionType)`);
+    public onEnable(): void {
+        eval(`server.__gcd_nbt_start__(this.settings.actionType);`);
     }
-    onDisable(): void {
-        throw new Error("Method not implemented.");
+    public onDisable(): void {
     }
-    
 }

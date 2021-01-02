@@ -1,9 +1,13 @@
 import { CheckConfiguration } from "./classes/Check";
 import { log } from "./index";
-//import { CheckConfiguration } from './classes/Check';
-export namespace config {
+
+export namespace Config {
     var initialized = false;
-    export var config : any;
+    var config : any;
+    export function getConfig() {
+        console.log(config);
+        return config;
+    }
     export function init() {
         if (!initialized) {
             try {
@@ -17,7 +21,7 @@ export namespace config {
     }
 
     export function getCheckSettings<T>(nid : string) : CheckConfiguration<T>  {
-        return config.checks.nid;
+        return config.checks[nid];
     }
 
     export function getActionType<T>(nid : string) : any {

@@ -7,12 +7,19 @@
 
 const system = server.registerSystem(0, 0);
 
+// ----------- Imports -----------
+
 import { Check } from './classes/Check';
 import { NBT } from './classes/checks/NBT';
 import { Reach } from './classes/checks/Reach';
-import { config } from './config';
+import { Config } from './config';
 
-var Checks : Check[] = [];
+// ----------- Variables -----------
+
+var currentTick = 0;
+var checks: Check[] = [];
+
+// ----------- Exports -----------
 
 export var serverStats = {
     MSPT: 50,
@@ -27,21 +34,21 @@ export var serverStats = {
 export function log(... i : any) {
     var finalLog : string = '';
     for (var k of i) {
-        switch(i + '') {
+        switch(k + '') {
             case '[object Object]':
-                finalLog += JSON.stringify(i);
+                finalLog += JSON.stringify(k);
                 break;
             case '[object Undefined]':
-                finalLog += "null";
+                finalLog += "undefined";
                 break;
             case '[object Null]':
                 finalLog += "null";
                 break;
             case '[object Array]':
-                finalLog += JSON.stringify(i);
+                finalLog += JSON.stringify(k);
                 break;
             default:
-                finalLog += ((i + ""))
+                finalLog += ((k + ""))
                     .split('\r\n').join('\n'); // mc only uses \n, looks cleaner
                 break;
         }
@@ -52,6 +59,35 @@ export function log(... i : any) {
     } else {
         server.log("[GCD] " + finalLog);
     }
+}
+
+export const cGlobal = Config;
+
+export function isImmune(player : IEntity) : boolean {
+    const tag : any = system.getComponent(player, "minecraft:tag");
+    if (!tag) return false;
+    return tag.data.includes("GCDAdmin");
+}
+
+// ----------- System -----------
+
+system.shutdown = function() {
+    shutdownChecks();
+}
+
+system.update = function() {
+    if (currentTick === 0) {
+        onInitialize();
+    }
+    currentTick++;
+}
+
+// ----------- Functions -----------
+
+function onInitialize() { // system.initialize broken?
+    checkServerType();
+    cGlobal.init();
+    initializeChecks();
 }
 
 function checkServerType() {
@@ -75,30 +111,32 @@ function checkServerType() {
     if (checksPassed > 0) {
         serverStats.server.jsConsole = true;
     }
-    log(`Checks passed: ${checksPassed}/3. Detected Server type: ${serverStats.server.serverType}`)
+    log(`Checks passed: ${checksPassed}/3. Detected Server type: ${serverStats.server.serverType}`);
 }
 
 function initializeChecks() {
-    var checks = config.config.checks;
-    if (checks.reach.eanbled) {
-        Checks.push(new Reach());
-    }
+    log("Enabling general checks...");
+    var reachSettings = cGlobal.getCheckSettings<Reach>('reach');
+    if (reachSettings.enabled)
+        checks.push(new Reach());
     if (serverStats.server.serverType == 'bdsx-node') {
-        Checks.push(new NBT());
+        // bdsx checks here
+        log(`Enabling BDSX checks...`);
+        var nbtSettings = cGlobal.getCheckSettings<NBT>('nbt');
+        if (nbtSettings.enabled)
+            checks.push(new NBT());
     }
+    checks.forEach(_check => {
+        var check : any = _check;
+        _check.system = system;
+        check.onEnable();
+    });
+    log("Checks enabled.");
 }
 
 function shutdownChecks() {
-    Checks.forEach(_check => {
-        eval('_check.onDisable();');
+    checks.forEach(_check => {
+        var check : any = _check;
+        check.onDisable();
     });
-}
-
-system.initialize = function() {
-    checkServerType();
-    config.init();
-}
-
-system.shutdown = function() {
-    shutdownChecks();
 }

@@ -1,4 +1,4 @@
-import { config } from '../config';
+import { Config } from '../config';
 import { ActionType } from './ActionType';
 
 export class Check {
@@ -9,10 +9,10 @@ export class Check {
         nid : ''
     }
     constructor(name : string, actionType : ActionType, nid : string) {
-
+        // WIP
     }
     public isEnabled() : boolean {
-        return config.getCheckSettings<this>(this.settings.nid).enabled;
+        return Config.getCheckSettings(this.settings.nid).enabled;
     }
 }
 
@@ -22,10 +22,10 @@ export interface TCheck {
     onDisable() : void
 }
 
-export interface Reach {
+export interface IReach {
     readonly maxReach : number;
 }
-export interface NBT {
+export interface INBT {
 }
 
 export interface CheckConfiguration<T> {
