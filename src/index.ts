@@ -5,7 +5,7 @@
 
 /// <reference types="minecraft-scripting-types-server" />
 
-const system = server.registerSystem(0, 0);
+export const system = server.registerSystem(0, 0);
 
 // ----------- Imports -----------
 
@@ -13,13 +13,29 @@ import { Check } from './classes/Check';
 import { NBT } from './classes/checks/NBT';
 import { Reach } from './classes/checks/Reach';
 import { Config } from './config';
+import { TagComponent } from './playerdata';
 
 // ----------- Variables -----------
 
 var currentTick = 0;
 var checks: Check[] = [];
+var serverAny : any = server;
 
 // ----------- Exports -----------
+
+export var externalListeners = new Map<string, ((data : any) => boolean)[]>();
+
+serverAny.__gcd_events__ = {
+    flagged: {
+        connect: function(flagType : string, listener : (data : any) => boolean) {
+            var currentList = externalListeners.get(flagType);
+            if (currentList == null) currentList = [];
+            currentList.push(listener);
+            externalListeners.set(flagType, currentList);
+            console.log(`listener added, current listener list for ${flagType}: ${externalListeners.get(flagType)}`)
+        }
+    }
+}
 
 export var serverStats = {
     MSPT: 50,
@@ -59,12 +75,18 @@ export function log(... i : any) {
     } else {
         server.log("[GCD] " + finalLog);
     }
+    if (serverAny.__GCD_CONFIG__.general.debug.logToChat) {
+        const msgData = system.createEventData(SendToMinecraftServer.DisplayChat);
+        if (!msgData) return;
+        msgData.data.message = `[${new Date().toLocaleString()}] [GCD] ${finalLog}`;
+        system.broadcastEvent(SendToMinecraftServer.DisplayChat, msgData);
+    }
 }
 
 export const cGlobal = Config;
 
 export function isImmune(player : IEntity) : boolean {
-    const tag : any = system.getComponent(player, "minecraft:tag");
+    const tag : TagComponent = system.getComponent(player, "minecraft:tag");
     if (!tag) return false;
     return tag.data.includes("GCDAdmin");
 }
@@ -81,6 +103,22 @@ system.update = function() {
     }
     currentTick++;
 }
+
+// ----------- Events -----------
+
+system.listenForEvent(ReceiveFromMinecraftServer.EntityCreated, (eventData) => {
+    const {
+        data: {
+            entity
+        }
+    } = eventData;
+    if (!system.hasComponent(entity, "minecraft:nameable")) return;
+    var nameable : IComponent<any> = system.getComponent(entity, MinecraftComponent.Nameable);
+    if (!nameable.data.name || nameable.data.name == '') return;
+    if (entity.__identifier__ === "minecraft:player") {
+        //wip
+    }
+})
 
 // ----------- Functions -----------
 

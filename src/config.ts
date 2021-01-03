@@ -5,7 +5,6 @@ export namespace Config {
     var initialized = false;
     var config : any;
     export function getConfig() {
-        console.log(config);
         return config;
     }
     export function init() {

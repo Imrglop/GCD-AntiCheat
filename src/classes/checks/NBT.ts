@@ -8,7 +8,6 @@ import { Check, TCheck } from "../Check";
 export class NBT extends Check implements TCheck {
     settings: any
     constructor() {
-        console.log(cGlobal);
         super('NBT', cGlobal.getActionType<NBT>('nbt'), 'nbt');
     }
     public onTick(): void {

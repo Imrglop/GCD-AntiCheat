@@ -2,6 +2,7 @@
 
 import { Config } from "../../config";
 import { isImmune, log } from "../../index";
+import { PlayerData } from "../../playerdata";
 import { Check, IReach, TCheck } from "../Check";
 
 // ----------- Class -----------
@@ -15,6 +16,7 @@ export class Reach extends Check implements TCheck {
     }
     onEnable(): void {
         var sys = this.system;
+        var gThis = this;
         this.system.listenForEvent(ReceiveFromMinecraftServer.PlayerAttackedEntity, function(eventData) {
             const {
                 data: {
@@ -49,8 +51,13 @@ export class Reach extends Check implements TCheck {
             dist3D = Math.abs(dist3D);
             log(`dist: ${dist3D}`);
             if (dist3D > Config.getCheckSettings<IReach>('reach').data.maxReach) {
-                // TODO: max reach times and creative mode
-                log('Player flagged');
+                var lastHit = PlayerData.reach.times.get(player.id);
+                var diff = Date.now() - lastHit;
+                PlayerData.reach.times.set(player.id, Date.now());
+                var minDiff = Config.getCheckSettings<IReach>('reach').data.nextHit * 1000;
+                if (!(diff >= minDiff)) return;
+                if (gThis.onFlagged({ "dist": dist3D, "timeDiff": diff })) return;
+                log('Player flagged (reach)');
             }
         })
     }
