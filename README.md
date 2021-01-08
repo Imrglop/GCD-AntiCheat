@@ -41,14 +41,18 @@
 
 # Listen for Flags
 
-You can use an **external** server script (can be in an addon too) to listen when a player is flagged, and cancel it when needed:
+You can use an **external** server script (can be in an addon too) to listen when a player is flagged, and cancel it when needed, example:
 
 ```js
-require('./gcd');
+require('./gcd'); // if in addon, best to place the listener in system.initialize
 function onReach(data) {
     console.log('Player failed reach, from external!')
-    console.log('Flag Data: ' + JSON.stringify(data));
-    return true; // returning true - Cancels the flag
+	console.log('Flag Data: ' + JSON.stringify(data));
+	if (data.distance < 4.00) return true; // returning true cancels the flag
+	var health = system.getComponent(data.target, "minecraft:health")
+	health.data.value = health.data.max;
+	system.applyComponentChanges(data.target, health);
+    return false;
 }
 server.__gcd_events__.flagged.connect('reach', onReach);
 ```

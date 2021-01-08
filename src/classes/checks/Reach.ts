@@ -1,7 +1,7 @@
 // ----------- Imports -----------
 
 import { Config } from "../../config";
-import { isImmune, log } from "../../index";
+import { debugLog, isImmune } from "../../index";
 import { PlayerData } from "../../playerdata";
 import { Check, IReach, TCheck } from "../Check";
 
@@ -24,9 +24,7 @@ export class Reach extends Check implements TCheck {
                     player
                 }
             } = eventData;
-            log("before")
             if (isImmune(player)) return;
-            log("after")
             var pos1 : IComponent<any> = sys.getComponent(player, "minecraft:position");
             var {
                 data
@@ -49,15 +47,17 @@ export class Reach extends Check implements TCheck {
             );
             dist3D -= hitboxComponent.data.width;
             dist3D = Math.abs(dist3D);
-            log(`dist: ${dist3D}`);
+            debugLog(`dist: ${dist3D}`);
             if (dist3D > Config.getCheckSettings<IReach>('reach').data.maxReach) {
                 var lastHit = PlayerData.reach.times.get(player.id);
                 var diff = Date.now() - lastHit;
                 PlayerData.reach.times.set(player.id, Date.now());
                 var minDiff = Config.getCheckSettings<IReach>('reach').data.nextHit * 1000;
-                if (!(diff >= minDiff)) return;
-                if (gThis.onFlagged({ "dist": dist3D, "timeDiff": diff })) return;
-                log('Player flagged (reach)');
+                debugLog(diff, minDiff);
+                if (diff < minDiff) {
+                    if (gThis.onFlagged({ "player": player, "target": attacked_entity, "distance": dist3D, "attack_interval_like": diff })) return;
+                    debugLog('Player flagged (reach)');
+                }
             }
         })
     }

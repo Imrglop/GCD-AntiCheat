@@ -12,7 +12,7 @@ export namespace Config {
             try {
                 eval("config = server.__GCD_CONFIG__;");
             } catch (e) {
-                log("Couldn't load config! err: " + e);
+                log(false, "Couldn't load config! err: " + e);
                 return;
             }
             initialized = true;
@@ -25,5 +25,9 @@ export namespace Config {
 
     export function getActionType<T>(nid : string) : any {
         return getCheckSettings<T>(nid).onFlagged;
+    }
+
+    export function getMessages(type : string) : any  {
+        return config.messages[type];
     }
 }

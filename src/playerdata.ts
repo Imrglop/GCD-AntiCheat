@@ -35,4 +35,7 @@ export namespace PlayerData {
          */
         export var times = new Map<number, number>();
     }
+    export namespace nuker {
+        export var blocksBroken = new Map<number, number>();
+    }
 }

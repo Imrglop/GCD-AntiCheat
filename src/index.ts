@@ -5,13 +5,17 @@
 
 /// <reference types="minecraft-scripting-types-server" />
 
-export const system = server.registerSystem(0, 0);
+export const system: IVanillaServerSystem = systemAny;
 
 // ----------- Imports -----------
 
+
+//#region checks
 import { Check } from './classes/Check';
 import { NBT } from './classes/checks/NBT';
 import { Reach } from './classes/checks/Reach';
+//#endregion
+
 import { Config } from './config';
 import { TagComponent } from './playerdata';
 
@@ -19,22 +23,40 @@ import { TagComponent } from './playerdata';
 
 var currentTick = 0;
 var checks: Check[] = [];
-var serverAny : any = server;
+var serverAny: any = server;
+var systemAny: any = system;
 
 // ----------- Exports -----------
 
-export var externalListeners = new Map<string, ((data : any) => boolean)[]>();
+export var externalListeners = new Map<string, ((data: any) => boolean)[]>();
+export var updateListeners: Function[] = [];
 
 serverAny.__gcd_events__ = {
     flagged: {
-        connect: function(flagType : string, listener : (data : any) => boolean) {
+        connect: function (flagType: string, listener: (data: any) => boolean) {
             var currentList = externalListeners.get(flagType);
             if (currentList == null) currentList = [];
             currentList.push(listener);
             externalListeners.set(flagType, currentList);
-            console.log(`listener added, current listener list for ${flagType}: ${externalListeners.get(flagType)}`)
         }
+    },
+    extra: {
+        getServerStats: function () {
+            return serverStats;
+        },
+        banPlayer: banPlayer
     }
+}
+
+export function banPlayer(player: IEntity): boolean {
+    const tag: TagComponent = system.getComponent(player, "minecraft:tag");
+    if (!tag) return false;
+    tag.data.push("GCDBanned");
+    return true;
+}
+
+export function formatMessage(message: string, s1: string): string {
+    return (message.split('&').join('\u00A7')).replace('%n', s1);
 }
 
 export var serverStats = {
@@ -47,10 +69,17 @@ export var serverStats = {
     }
 }
 
-export function log(... i : any) {
-    var finalLog : string = '';
+export function debugLog(...i: any) {
+    if (Config.getConfig().general.debug.general) {
+        log(i);
+    }
+}
+
+export function log(debug: boolean, ...i: any) {
+    var finalLog: string = '';
+    if (debug && !Config.getConfig().general.debug.general) return;
     for (var k of i) {
-        switch(k + '') {
+        switch (k + '') {
             case '[object Object]':
                 finalLog += JSON.stringify(k);
                 break;
@@ -85,19 +114,19 @@ export function log(... i : any) {
 
 export const cGlobal = Config;
 
-export function isImmune(player : IEntity) : boolean {
-    const tag : TagComponent = system.getComponent(player, "minecraft:tag");
+export function isImmune(player: IEntity): boolean {
+    const tag: TagComponent = system.getComponent(player, "minecraft:tag");
     if (!tag) return false;
     return tag.data.includes("GCDAdmin");
 }
 
 // ----------- System -----------
 
-system.shutdown = function() {
+system.shutdown = function () {
     shutdownChecks();
 }
 
-system.update = function() {
+system.update = function () {
     if (currentTick === 0) {
         onInitialize();
     }
@@ -113,7 +142,7 @@ system.listenForEvent(ReceiveFromMinecraftServer.EntityCreated, (eventData) => {
         }
     } = eventData;
     if (!system.hasComponent(entity, "minecraft:nameable")) return;
-    var nameable : IComponent<any> = system.getComponent(entity, MinecraftComponent.Nameable);
+    var nameable: IComponent<any> = system.getComponent(entity, MinecraftComponent.Nameable);
     if (!nameable.data.name || nameable.data.name == '') return;
     if (entity.__identifier__ === "minecraft:player") {
         //wip
@@ -135,46 +164,47 @@ function checkServerType() {
         serverStats.server.setTimeoutEnabled = true;
         serverStats.server.serverType = 'modded';
         checksPassed++;
-    } catch {}
+    } catch { }
     try {
         eval("require");
         checksPassed++;
         serverStats.server.serverType = 'any-node';
-    } catch {}
+    } catch { }
     try {
         eval("require(\"bdsx\")");
         checksPassed++;
         serverStats.server.serverType = 'bdsx-node';
-    } catch {}
+    } catch { }
     if (checksPassed > 0) {
         serverStats.server.jsConsole = true;
     }
-    log(`Checks passed: ${checksPassed}/3. Detected Server type: ${serverStats.server.serverType}`);
+    log(false, `Checks passed: ${checksPassed}/3. Detected Server type: ${serverStats.server.serverType}`);
 }
 
 function initializeChecks() {
-    log("Enabling general checks...");
+    log(false, "Enabling general checks...");
     var reachSettings = cGlobal.getCheckSettings<Reach>('reach');
     if (reachSettings.enabled)
         checks.push(new Reach());
     if (serverStats.server.serverType == 'bdsx-node') {
         // bdsx checks here
-        log(`Enabling BDSX checks...`);
+        log(false, `Enabling BDSX checks...`);
         var nbtSettings = cGlobal.getCheckSettings<NBT>('nbt');
         if (nbtSettings.enabled)
             checks.push(new NBT());
+        serverAny.__gcd_commands_start__();
     }
     checks.forEach(_check => {
-        var check : any = _check;
+        var check: any = _check;
         _check.system = system;
         check.onEnable();
     });
-    log("Checks enabled.");
+    log(false, "Checks enabled.");
 }
 
 function shutdownChecks() {
     checks.forEach(_check => {
-        var check : any = _check;
+        var check: any = _check;
         check.onDisable();
     });
 }
