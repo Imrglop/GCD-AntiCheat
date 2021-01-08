@@ -1,6 +1,7 @@
 // ----------- Imports -----------
 
 import { Config } from "../../config";
+import { debugLog, isImmune, log } from "../../index";
 import { PlayerData } from "../../playerdata";
 import { getServerTPS } from "../../tps";
 import { Check, INuker, TCheck } from "../Check";
@@ -8,6 +9,9 @@ import { Check, INuker, TCheck } from "../Check";
 // ----------- Class -----------
 
 export class Nuker extends Check implements TCheck {
+    constructor() {
+        super('Nuker', Config.getActionType<this>('nuker'), 'nuker');
+    }
     onTick(): void {
         if (true /*TODO: check if player is valid*/) {
             for (var [i, v] of PlayerData.nuker.blocksBroken) {
@@ -27,12 +31,16 @@ export class Nuker extends Check implements TCheck {
                     player
                 }
             } = eventData;
+            if (isImmune(player)) return;
             var blocksBroken = PlayerData.nuker.blocksBroken.get(player.id);
             if (!blocksBroken) blocksBroken = 0;
             blocksBroken++;
             var checkSettings = Config.getCheckSettings<INuker>('nuker');
-            const maxBlocks = Math.floor((checkSettings.data.tolerance * 20) / getServerTPS());
+            var maxBlocks = Math.floor((checkSettings.data.tolerance * 20) / getServerTPS());
+            maxBlocks = maxBlocks < checkSettings.data.tolerance ? checkSettings.data.tolerance : maxBlocks; // too low? set to tolerance
+            log(true,'blocks=', blocksBroken, '/', maxBlocks);
             if (blocksBroken > maxBlocks) {
+                log(true,'player failed Nuker')
                 this.onFlagged({ player: player, blocks_affected: blocksBroken });
             }
         })

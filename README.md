@@ -58,3 +58,6 @@ server.__gcd_events__.flagged.connect('reach', onReach);
 ```
 
 *Note: there can be multiple listeners, the ones with priority are the first ones to be added*
+
+# Known issues
+- If you click fast using knockback 2 on a player or entity, you will get false flagged

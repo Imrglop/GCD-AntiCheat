@@ -1,25 +1,13 @@
 // ----------- Imports -----------
 
-import { log, system } from "./index";
 
 // ----------- Varialbes -----------
-
-var defaultData = 
-{
-    "reach": {
-        "times": 0,
-        "flags": 0
-    },
-    "nbt": {
-        "flags": 0
-    }
-}
 
 // ----------- Class -----------
 
 export interface FlagData {
-    flags : number
-    times? : number
+    flags: number
+    times?: number
 }
 
 export interface TagComponent {

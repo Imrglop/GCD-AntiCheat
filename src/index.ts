@@ -5,7 +5,7 @@
 
 /// <reference types="minecraft-scripting-types-server" />
 
-export const system: IVanillaServerSystem = systemAny;
+export const system: IVanillaServerSystem = server.registerSystem(0, 0);
 
 // ----------- Imports -----------
 
@@ -13,6 +13,7 @@ export const system: IVanillaServerSystem = systemAny;
 //#region checks
 import { Check } from './classes/Check';
 import { NBT } from './classes/checks/NBT';
+import { Nuker } from './classes/checks/Nuker';
 import { Reach } from './classes/checks/Reach';
 //#endregion
 
@@ -24,7 +25,7 @@ import { TagComponent } from './playerdata';
 var currentTick = 0;
 var checks: Check[] = [];
 var serverAny: any = server;
-var systemAny: any = system;
+//var systemAny: any = system;
 
 // ----------- Exports -----------
 
@@ -71,7 +72,7 @@ export var serverStats = {
 
 export function debugLog(...i: any) {
     if (Config.getConfig().general.debug.general) {
-        log(i);
+        log(true, i);
     }
 }
 
@@ -127,6 +128,11 @@ system.shutdown = function () {
 }
 
 system.update = function () {
+    for (let tickCheck of checks) {
+        if (tickCheck.isEnabled()) {
+            eval('tickCheck.onTick()');
+        }
+    }
     if (currentTick === 0) {
         onInitialize();
     }
@@ -184,8 +190,11 @@ function checkServerType() {
 function initializeChecks() {
     log(false, "Enabling general checks...");
     var reachSettings = cGlobal.getCheckSettings<Reach>('reach');
-    if (reachSettings.enabled)
-        checks.push(new Reach());
+    if (reachSettings.enabled) checks.push(new Reach());
+
+    reachSettings = cGlobal.getCheckSettings<Reach>('nuker');
+    if (reachSettings.enabled) checks.push(new Nuker());
+
     if (serverStats.server.serverType == 'bdsx-node') {
         // bdsx checks here
         log(false, `Enabling BDSX checks...`);

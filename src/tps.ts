@@ -1,9 +1,11 @@
+var _system = server.registerSystem(0, 0);
+
 // ----------- Imports -----------
 
 import { updateListeners } from "./index";
 
-
 // ----------- Exports -----------
+// ----------- Functions -----------
 
 var lastUNIX = Date.now();
 var thisUNIX = Date.now();
@@ -34,7 +36,7 @@ export function getServerTPS(): number {
 }
 
 
-updateListeners.push(() => {
+_system.update = () => {
     thisUNIX = Date.now();
     if (_tps.length > 63) {
         _tps.shift();
@@ -42,4 +44,4 @@ updateListeners.push(() => {
         _tps.push((thisUNIX - lastUNIX));
     }
     lastUNIX = Date.now();
-})
+}

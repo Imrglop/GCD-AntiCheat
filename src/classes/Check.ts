@@ -41,7 +41,7 @@ export class Check {
             case ActionType.PLAYER_KICK:
                 var messageBase = Config.getMessages('kick')[this.settings.nid];
                 messageBase = messageBase ? messageBase : Config.getMessages('kick').default;
-                this.system.executeCommand(`kick @a[name="${name}"] ${formatMessage(messageBase, this.settings.nid)}`, () => { });
+                this.system.executeCommand(`kick @a[name="${name}"] ${formatMessage(messageBase, this.settings.name)}`, () => { });
                 break;
             case ActionType.PLAYER_BAN:
                 banPlayer(data.player);

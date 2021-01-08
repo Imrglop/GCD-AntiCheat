@@ -17,7 +17,7 @@ server.__GCD_CONFIG__ =
             "enabled": true,
             "onFlagged": "kick", // ban, warn, misc
             "data": {
-                "maxReach": 3.5,
+                "maxReach": 3.7,
                 "nextHit": 1 // Next time, a hit needs to be below this number (seconds) 
             }
         },
@@ -38,7 +38,7 @@ server.__GCD_CONFIG__ =
     "messages":
     {
         "kick": {
-            "default": "&cYou have been kicked for Cheating: &4%c&c."
+            "default": "&cYou have been kicked for Cheating: &4%n&c."
             // Place specific messages here, e.g. uncomment below
             //,"nuker": "&2&lCustom Nuker Kick Message"
         },
