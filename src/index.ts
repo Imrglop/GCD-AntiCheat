@@ -7,20 +7,22 @@
 
 export const system: IVanillaServerSystem = server.registerSystem(0, 0);
 
+import { ChatColor } from './classes/ChatColor';
 // ----------- Imports -----------
-
 
 //#region checks
 import { Check } from './classes/Check';
 import { NBT } from './classes/checks/NBT';
 import { Nuker } from './classes/checks/Nuker';
 import { Reach } from './classes/checks/Reach';
+import { XRay } from './classes/checks/XRay';
 //#endregion
 
 import { Config } from './config';
 import { TagComponent } from './playerdata';
 
 // ----------- Variables -----------
+
 
 var currentTick = 0;
 var checks: Check[] = [];
@@ -31,6 +33,7 @@ var serverAny: any = server;
 
 export var externalListeners = new Map<string, ((data: any) => boolean)[]>();
 export var updateListeners: Function[] = [];
+export var players = new Map<number, IEntity>();
 
 serverAny.__gcd_events__ = {
     flagged: {
@@ -54,6 +57,11 @@ export function banPlayer(player: IEntity): boolean {
     if (!tag) return false;
     tag.data.push("GCDBanned");
     return true;
+}
+
+export function broadcast(message: any, tag = "GCDAdmin") {
+    system.executeCommand(`tellraw @a[tag=${tag}] {"rawtext":[{"text":"${ChatColor.GOLD}[${ChatColor.GOLD_2}GCD${ChatColor.GOLD}] ${ChatColor.DARK_GREEN}${message}"}]}`, () => {});
+    log(false, "Broadcast: ", message);
 }
 
 export function formatMessage(message: string, s1: string): string {
@@ -101,7 +109,7 @@ export function log(debug: boolean, ...i: any) {
         finalLog += " ";
     }
     if (serverStats.server.jsConsole) {
-        console.log(`[${new Date().toLocaleString()}] [GCD] ${finalLog}`)
+        console.log(`${Config.getConfig().logger.timestamp?`[${new Date().toLocaleString()}] `:''}[GCD] ${finalLog}`)
     } else {
         server.log("[GCD] " + finalLog);
     }
@@ -151,15 +159,15 @@ system.listenForEvent(ReceiveFromMinecraftServer.EntityCreated, (eventData) => {
     var nameable: IComponent<any> = system.getComponent(entity, MinecraftComponent.Nameable);
     if (!nameable.data.name || nameable.data.name == '') return;
     if (entity.__identifier__ === "minecraft:player") {
-        //wip
+        players.set(entity.id, entity);
     }
 })
 
 // ----------- Functions -----------
 
 function onInitialize() { // system.initialize broken?
-    checkServerType();
     cGlobal.init();
+    checkServerType();
     initializeChecks();
 }
 
@@ -189,11 +197,14 @@ function checkServerType() {
 
 function initializeChecks() {
     log(false, "Enabling general checks...");
-    var reachSettings = cGlobal.getCheckSettings<Reach>('reach');
-    if (reachSettings.enabled) checks.push(new Reach());
+    var fset = cGlobal.getCheckSettings<Reach>('reach');
+    if (fset.enabled) checks.push(new Reach());
 
-    reachSettings = cGlobal.getCheckSettings<Reach>('nuker');
-    if (reachSettings.enabled) checks.push(new Nuker());
+    fset = cGlobal.getCheckSettings<Reach>('nuker');
+    if (fset.enabled) checks.push(new Nuker());
+
+    fset = cGlobal.getCheckSettings<XRay>('x-ray');
+    if (fset.enabled) checks.push(new XRay());
 
     if (serverStats.server.serverType == 'bdsx-node') {
         // bdsx checks here

@@ -1,4 +1,4 @@
-// Premade Script
+// FIXME chests
 
 const system = server.registerSystem(0, 0);
 
@@ -10,7 +10,6 @@ server.__gcd_nbt_start__ = function(... args) {
         ptr.move(3);
         var actor = ni.getActor();
         var entity = actor.getEntity();
-
         var type2 = ptr.readVarUint();
         ptr.move(1);
         // Read Packet

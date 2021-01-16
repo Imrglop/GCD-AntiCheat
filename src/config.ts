@@ -30,4 +30,8 @@ export namespace Config {
     export function getMessages(type: string): any {
         return config.messages[type];
     }
+
+    export function getBroadcastTag(): string {
+        return config.general.broadcastTag;
+    }
 }

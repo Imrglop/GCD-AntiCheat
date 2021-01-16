@@ -3,7 +3,11 @@
 server.__GCD_CONFIG__ =
 {
     "configVersion": "b2.0.0",
+    "logger": {
+        "timestamp": true // e.g. [1/16/2021 12:00:00 PM] [GCD] ...
+    },
     "general": {
+        "broadcastTag": "GCDAdmin",
         "debug": {
             "general": true, // general debug mode actions
             "logToChat": true // used for debugging as an addon/ingame
@@ -33,6 +37,14 @@ server.__GCD_CONFIG__ =
         "nbt": {
             "enabled": true,
             "onFlagged": "misc" // remove the cheated item from inventory
+        },
+
+        "x-ray": {
+            "enabled": true,
+            "onFlagged": "misc", // Not recommended, keep at "misc"
+            "data": {
+                "blocks": ['diamond_ore', 'iron_ore', 'gold_ore','ancient_debris','nether_gold_ore','emerald_ore','coal_ore','']
+            }
         }
     },
     "messages":

@@ -1,8 +1,7 @@
 // ----------- Imports -----------
 
 import { Config } from '../config';
-import { banPlayer, cGlobal, externalListeners, formatMessage } from '../index';
-import { TagComponent } from '../playerdata';
+import { banPlayer, cGlobal, externalListeners, formatMessage, log } from '../index';
 import { getServerTPS } from '../tps';
 import { ActionType } from './ActionType';
 
@@ -48,7 +47,9 @@ export class Check {
                 break;
         }
         if (cGlobal.getConfig().general.apiEnabled) {
+            log(true, this.settings);
             for (let listener of externalListeners.get(this.settings.nid)) {
+                log(true, "Cancel= ", listener(data)?"true":"false");
                 return listener(data);
             }
         }
@@ -67,6 +68,10 @@ export interface TCheck {
 export interface IReach {
     readonly maxReach: number;
     readonly nextHit: number;
+}
+
+export interface IXRay {
+    readonly blocks: string[];
 }
 
 export interface INBT {

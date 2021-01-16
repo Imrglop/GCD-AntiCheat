@@ -1,6 +1,6 @@
 // ----------- Imports -----------
 
-import { cGlobal } from "../../index";
+import { banPlayer, cGlobal } from "../../index";
 import { Check, TCheck } from "../Check";
 
 // ----------- Class -----------
@@ -13,7 +13,13 @@ export class NBT extends Check implements TCheck {
     public onTick(): void {
     }
     public onEnable(): void {
-        eval(`server.__gcd_nbt_start__(this.settings.actionType);`);
+        // FIXME: Fix Placing down chests cancelling for some reason
+
+        if (banPlayer != null) {
+            var serverAny : any = server;
+            serverAny.__gcd_nbt_start__(this.settings.actionType, banPlayer, this)
+            //eval(`server.__gcd_nbt_start__(this.settings.actionType, bp, of);`);
+        }
     }
     public onDisable(): void {
     }
