@@ -26,7 +26,7 @@
 
 - Download the standalone version of a release
 - Place the folder in `bdsx` folder (or wherever you put your scripts)
-- Add `require ./gcd` in your `index.js`
+- Add `require './gcd'` in your `index.js`
 
 # Build
  Current Instructions:
@@ -47,11 +47,11 @@ You can use an **external** server script (can be in an addon too) to listen whe
 require('./gcd'); // if in addon, best to place the listener in system.initialize
 function onReach(data) {
     console.log('Player failed reach, from external!')
-	console.log('Flag Data: ' + JSON.stringify(data));
-	if (data.distance < 4.00) return true; // returning true cancels the flag
-	var health = system.getComponent(data.target, "minecraft:health")
-	health.data.value = health.data.max;
-	system.applyComponentChanges(data.target, health);
+    console.log('Flag Data: ' + JSON.stringify(data));
+    if (data.distance < 4.00) return true; // returning true cancels the flag
+    var health = system.getComponent(data.target, "minecraft:health")
+    health.data.value = health.data.max;
+    system.applyComponentChanges(data.target, health);
     return false;
 }
 server.__gcd_events__.flagged.connect('reach', onReach);
