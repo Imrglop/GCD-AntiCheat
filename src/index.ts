@@ -7,7 +7,6 @@
 
 export const system: IVanillaServerSystem = server.registerSystem(0, 0);
 
-import { ChatColor } from './classes/ChatColor';
 // ----------- Imports -----------
 
 //#region checks
@@ -18,8 +17,10 @@ import { Reach } from './classes/checks/Reach';
 import { XRay } from './classes/checks/XRay';
 //#endregion
 
+import { ChatColor } from './classes/ChatColor';
 import { Config } from './config';
 import { TagComponent } from './playerdata';
+import { SpawnExperienceOrb } from './classes/checks/SpawnExperienceOrb';
 
 // ----------- Variables -----------
 
@@ -209,9 +210,12 @@ function initializeChecks() {
     if (serverStats.server.serverType == 'bdsx-node') {
         // bdsx checks here
         log(false, `Enabling BDSX checks...`);
-        var nbtSettings = cGlobal.getCheckSettings<NBT>('nbt');
-        if (nbtSettings.enabled)
-            checks.push(new NBT());
+        var set = cGlobal.getCheckSettings<NBT>('nbt');
+        if (set.enabled) checks.push(new NBT());
+
+        set = cGlobal.getCheckSettings<SpawnExperienceOrb>('spawn-xp')
+        if (set.enabled) checks.push(new SpawnExperienceOrb());
+        
         serverAny.__gcd_commands_start__();
     }
     checks.forEach(_check => {

@@ -32,19 +32,23 @@ server.__GCD_CONFIG__ =
                 "tolerance": 9
             }
         },
-
+        "x-ray": {
+            "enabled": true,
+            "onFlagged": "misc", // Not recommended, keep at "misc"
+            "data": {
+                "blocks": ['diamond_ore', 'iron_ore', 'gold_ore','ancient_debris','nether_gold_ore','emerald_ore','coal_ore']
+            }
+        },
+        
         // -- Below only work on certain modded servers, this is auto detected --
         "nbt": {
             "enabled": true,
             "onFlagged": "misc" // remove the cheated item from inventory
         },
 
-        "x-ray": {
+        "spawn-xp": {
             "enabled": true,
-            "onFlagged": "misc", // Not recommended, keep at "misc"
-            "data": {
-                "blocks": ['diamond_ore', 'iron_ore', 'gold_ore','ancient_debris','nether_gold_ore','emerald_ore','coal_ore','']
-            }
+            "onFlagged": "kick"
         }
     },
     "messages":

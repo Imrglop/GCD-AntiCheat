@@ -11,6 +11,7 @@
 	} catch (e) {return;}
 	require('./config');
 	require('./nbt');
+	require('./extras')
 	require('./commands')
 	require('./gcd');
 })();
