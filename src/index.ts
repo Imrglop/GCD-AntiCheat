@@ -186,7 +186,7 @@ function checkServerType() {
         serverStats.server.serverType = 'any-node';
     } catch { }
     try {
-        eval("require(\"bdsx\")");
+        eval("require(\"bdsx/index\")");
         checksPassed++;
         serverStats.server.serverType = 'bdsx-node';
     } catch { }

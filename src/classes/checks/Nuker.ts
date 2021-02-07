@@ -9,11 +9,13 @@ import { Check, INuker, TCheck } from "../Check";
 // ----------- Class -----------
 
 export class Nuker extends Check implements TCheck {
+    private tick: number = 0;
     constructor() {
         super('Nuker', Config.getActionType<this>('nuker'), 'nuker');
     }
     onTick(): void {
         if (true) {
+            //log(true, "Tickrate:", this.tick)
             for (let [i, v] of PlayerData.nuker.blocksBroken) {
                 if (!(isImmune(players.get(i)))) {
                     if (v > 0) {
@@ -23,6 +25,7 @@ export class Nuker extends Check implements TCheck {
                 }
             }
         }
+        this.tick++;
     }
     onEnable(): void {
         this.system.listenForEvent(ReceiveFromMinecraftServer.PlayerDestroyedBlock, (eventData) => {
@@ -35,8 +38,10 @@ export class Nuker extends Check implements TCheck {
             } = eventData;
             if (isImmune(player)) return;
             var blocksBroken = PlayerData.nuker.blocksBroken.get(player.id);
-            if (!blocksBroken) blocksBroken = 0;
+            log(true, "Broken: ", PlayerData.nuker.blocksBroken.get(player.id));
+            if (isNaN(blocksBroken)) blocksBroken = -1;
             blocksBroken++;
+            PlayerData.nuker.blocksBroken.set(player.id, blocksBroken);
             var checkSettings = Config.getCheckSettings<INuker>('nuker');
             var maxBlocks = Math.floor((checkSettings.data.tolerance * 20) / getServerTPS());
             maxBlocks = maxBlocks < checkSettings.data.tolerance ? checkSettings.data.tolerance : maxBlocks; // too low? set to tolerance

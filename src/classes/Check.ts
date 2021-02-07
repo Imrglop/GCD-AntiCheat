@@ -1,7 +1,7 @@
 // ----------- Imports -----------
 
 import { Config } from '../config';
-import { banPlayer, cGlobal, externalListeners, formatMessage, log } from '../index';
+import { banPlayer, cGlobal, externalListeners, formatMessage, isImmune, log } from '../index';
 import { getServerTPS } from '../tps';
 import { ActionType } from './ActionType';
 
@@ -36,6 +36,9 @@ export class Check {
         var playerName = this.system.getComponent(data.player, MinecraftComponent.Nameable);
         if (!playerName) return;
         const name = playerName.data.name;
+        if (isImmune(data.player)) {
+            return;
+        }
         switch (Config.getActionType(this.settings.nid)) {
             case ActionType.PLAYER_KICK:
                 var messageBase = Config.getMessages('kick')[this.settings.nid];
