@@ -2,7 +2,6 @@
  A BDSX script-plugin that prevents players from cheating in certain Minecraft: Bedrock Edition servers.
 
 # Install
-## BDSX
 
 - Download source (or from a release)
-- Add `require './gcd'` in your `index.ts`
+- Add `require './gcd'` in your `launcher.ts`
