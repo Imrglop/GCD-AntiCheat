@@ -1,0 +1,1 @@
+console.log("[GCD] hello world");
