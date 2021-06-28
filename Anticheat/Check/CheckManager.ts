@@ -16,8 +16,18 @@ export class CheckManager {
     }
 
     public enableChecks(): void {
-        for (var check of this.checks) {
+        for (let check of this.checks) {
             Logger.log("Enable Check " + check.getCheckNameDecorated());
+            check.setEnabled(true);
+        }
+    }
+
+    public disableChecks(): void {
+        for (let check of this.checks) {
+            Logger.log("Disable Check " + check.getCheckName());
+            if (check.isEnabled()) {
+                check.setEnabled(false);
+            }
         }
     }
 }

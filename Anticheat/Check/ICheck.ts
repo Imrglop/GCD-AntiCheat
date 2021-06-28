@@ -7,12 +7,16 @@ export const enum CheckCategory {
 }
 
 export interface ICheck {
+    onEnable(): void;
+    onDisable(): void;
+
     getCheckName(): string;
     getDescription(): string;
 }
 
 export class Check implements ICheck {
     private category: CheckCategory;
+    private enabled: boolean;
 
     public static overrideErr(funcName: string) {
         throw new Error(`${funcName} is not overridden while required.`);
@@ -51,5 +55,24 @@ export class Check implements ICheck {
 
     public getCheckNameDecorated(): string {
         return this.getCheckName() + " (" + this.getCategoryName() + ")";
+    }
+
+    public onEnable(): void {
+    }
+
+    public onDisable(): void {
+    }
+
+    public setEnabled(b: boolean): void {
+        if (b) {
+            this.onEnable();
+        } else {
+            this.onDisable();
+        }
+        this.enabled = b;
+    }
+
+    public isEnabled(): boolean {
+        return this.enabled;
     }
 }

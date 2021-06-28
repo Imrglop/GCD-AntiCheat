@@ -12,4 +12,10 @@ export class TestCheck extends Check implements ICheck {
     public override getDescription(): string {
         return "yes";
     }
+
+    public override onEnable(): void {
+    }
+
+    public override onDisable(): void {
+    }
 }

@@ -1,5 +1,7 @@
 // ----------- Imports -----------
 import { existsSync, mkdirSync } from 'fs';
+import { bedrockServer } from '../bdsx';
+import { events } from '../bdsx/event';
 import { checkManager } from './Anticheat/Check/CheckManager';
 import { Config } from './Config';
 import { Logger } from './Logger';
@@ -25,3 +27,7 @@ checkManager.init();
 checkManager.enableChecks();
 
 Logger.log("Loaded.");
+
+events.serverClose.on(() => {
+    checkManager.disableChecks();
+})
