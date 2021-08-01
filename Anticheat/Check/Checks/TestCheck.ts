@@ -18,4 +18,15 @@ export class TestCheck extends Check implements ICheck {
 
     public override onDisable(): void {
     }
+
+    public override getDefaultSettings() {
+        return {
+            "gaming": "yeet",
+            "this is a": [
+                "test",
+                "idk",
+                42
+            ]
+        }
+    }
 }

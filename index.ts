@@ -1,7 +1,6 @@
 // ----------- Imports -----------
 import { existsSync, mkdirSync } from 'fs';
-import { bedrockServer } from '../bdsx';
-import { events } from '../bdsx/event';
+import { events } from 'bdsx/event';
 import { checkManager } from './Anticheat/Check/CheckManager';
 import { Config } from './Config';
 import { Logger } from './Logger';
@@ -11,20 +10,21 @@ export const dirPath: string = "./GCD";
 export const configName: string = "config.yml";
 export var config: Config = new Config();
 
+export const isDebugMode: boolean = true;
+
 if (!existsSync(dirPath)) {
     mkdirSync(dirPath);
 }
+
+checkManager.init();
 
 var res = config.load(dirPath + "/" + configName);
 
 if (res == false) {
     Logger.error("Could not load the config correctly!");
 } else {
-    console.log(Logger.log("Loaded config succesfully."));
+    Logger.log("Loaded config succesfully.");
 }
-
-checkManager.init();
-checkManager.enableChecks();
 
 Logger.log("Loaded.");
 

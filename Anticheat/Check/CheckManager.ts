@@ -1,8 +1,9 @@
 import { Logger } from "../../Logger";
 import { KillauraCheck } from "./Checks/KillauraCheck";
 import { TestCheck } from "./Checks/TestCheck";
+import { CrasherCheck } from "./Checks/CrasherCheck";
 import { Check } from "./ICheck";
-
+import { isDebugMode } from "../..";
 
 export class CheckManager {
     private checks: Check[] = [];
@@ -12,23 +13,32 @@ export class CheckManager {
 
     public init(): void {
         this.checks.push(new KillauraCheck());
-        this.checks.push(new TestCheck());
+        if (isDebugMode) {
+            this.checks.push(new TestCheck());
+        }
+        this.checks.push(new CrasherCheck());
     }
 
     public enableChecks(): void {
         for (let check of this.checks) {
-            Logger.log("Enable Check " + check.getCheckNameDecorated());
-            check.setEnabled(true);
+            check.setEnabled(check.getCurrentSettings()["Enabled"]);
+            if (check.isEnabled()) {
+                Logger.log("Enable Check " + check.getCheckNameDecorated());
+            }
         }
     }
 
     public disableChecks(): void {
         for (let check of this.checks) {
-            Logger.log("Disable Check " + check.getCheckName());
             if (check.isEnabled()) {
+                Logger.log("Disable Check " + check.getCheckName());
                 check.setEnabled(false);
             }
         }
+    }
+
+    public getChecks() {
+        return this.checks;
     }
 }
 

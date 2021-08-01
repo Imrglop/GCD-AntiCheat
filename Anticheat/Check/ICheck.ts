@@ -1,3 +1,6 @@
+import { config } from "../..";
+import { Config } from "../../Config";
+
 export const enum CheckCategory {
     Combat,
     Movement,
@@ -12,6 +15,8 @@ export interface ICheck {
 
     getCheckName(): string;
     getDescription(): string;
+
+    getDefaultSettings(): any;
 }
 
 export class Check implements ICheck {
@@ -74,5 +79,13 @@ export class Check implements ICheck {
 
     public isEnabled(): boolean {
         return this.enabled;
+    }
+
+    public getDefaultSettings() {
+        return {};
+    }
+
+    public getCurrentSettings() {
+        return config.yamlObj().Checks[this.getCategoryName()][this.getCheckName()];
     }
 }

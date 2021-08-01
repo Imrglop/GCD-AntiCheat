@@ -1,5 +1,5 @@
-import { serverInstance } from "../../bdsx";
 import { ServerPlayer } from "../../bdsx/bds/player";
+import { serverInstance } from "../../bdsx/bds/server";
 
 export namespace Util {
     export var playerList: ServerPlayer[] = [];
